@@ -18,10 +18,10 @@
     { t: 0.00, top: '#1d2a52', mid: '#7d6f95', hor: '#f4b48f', sea: '#3c4766', sun: 0.04, sunX: 0.18, light: 0.45, night: 0.25, lit: 0.18, cloud: 0.35, rain: 0, fog: 0.75, warm: 0.55, clock: 380, w: 'Mgła nad zatoką · 9°C' },
     { t: 0.12, top: '#2a3f74', mid: '#9a8fb0', hor: '#ffc9a0', sea: '#4a5779', sun: 0.12, sunX: 0.22, light: 0.6, night: 0.08, lit: 0.06, cloud: 0.3, rain: 0, fog: 0.55, warm: 0.6, clock: 400, w: 'Mgła nad zatoką · 9°C' },
     { t: 0.32, top: '#2f6fbf', mid: '#79aee2', hor: '#d6ecf8', sea: '#2d5f8f', sun: 0.92, sunX: 0.5, light: 1, night: 0, lit: 0, cloud: 0.4, rain: 0, fog: 0, warm: 0, clock: 750, w: 'Bezchmurnie · 19°C' },
-    { t: 0.54, top: '#36366e', mid: '#c2667a', hor: '#ffb062', sea: '#5b4560', sun: 0.06, sunX: 0.8, light: 0.7, night: 0.12, lit: 0.22, cloud: 0.45, rain: 0, fog: 0.05, warm: 1, clock: 1180, w: 'Zachód słońca · 17°C' },
-    { t: 0.74, top: '#1b2330', mid: '#2e3848', hor: '#4a5566', sea: '#1d2633', sun: -0.3, sunX: 0.9, light: 0.25, night: 0.7, lit: 0.55, cloud: 1, rain: 1, fog: 0.35, warm: 0.15, clock: 1270, w: 'Deszcz · 12°C' },
-    { t: 0.95, top: '#03060f', mid: '#0b1430', hor: '#1f2b4d', sea: '#070c1a', sun: -0.5, sunX: 0.95, light: 0.08, night: 1, lit: 0.82, cloud: 0.15, rain: 0, fog: 0.1, warm: 0.1, clock: 1410, w: 'Bezchmurnie · 10°C' },
-    { t: 1.00, top: '#03060f', mid: '#0b1430', hor: '#1f2b4d', sea: '#070c1a', sun: -0.5, sunX: 0.95, light: 0.08, night: 1, lit: 0.85, cloud: 0.15, rain: 0, fog: 0.1, warm: 0.1, clock: 1415, w: 'Bezchmurnie · 10°C' },
+    { t: 0.54, top: '#36366e', mid: '#c2667a', hor: '#ffb062', sea: '#5b4560', sun: 0.06, sunX: 0.8, light: 0.7, night: 0.12, lit: 0.1, cloud: 0.45, rain: 0, fog: 0.05, warm: 1, clock: 1180, w: 'Zachód słońca · 17°C' },
+    { t: 0.74, top: '#1b2330', mid: '#2e3848', hor: '#4a5566', sea: '#1d2633', sun: -0.3, sunX: 0.9, light: 0.25, night: 0.7, lit: 0.36, cloud: 1, rain: 1, fog: 0.35, warm: 0.15, clock: 1270, w: 'Deszcz · 12°C' },
+    { t: 0.95, top: '#03060f', mid: '#0b1430', hor: '#1f2b4d', sea: '#070c1a', sun: -0.5, sunX: 0.95, light: 0.08, night: 1, lit: 0.48, cloud: 0.15, rain: 0, fog: 0.1, warm: 0.1, clock: 1410, w: 'Bezchmurnie · 10°C' },
+    { t: 1.00, top: '#03060f', mid: '#0b1430', hor: '#1f2b4d', sea: '#070c1a', sun: -0.5, sunX: 0.95, light: 0.08, night: 1, lit: 0.5, cloud: 0.15, rain: 0, fog: 0.1, warm: 0.1, clock: 1415, w: 'Bezchmurnie · 10°C' },
   ];
   const hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
   const mixC = (a, b, f) => a.map((v, i) => v + (b[i] - v) * f);
@@ -136,7 +136,7 @@
 
     // wieża
     const tw = Math.min(W * (mobile ? 0.4 : 0.17), 300);
-    const th = Math.min(H * (mobile ? 0.46 : 0.56), tw * 3.4);
+    const th = Math.min(H * (mobile ? 0.44 : 0.5), tw * 3.4);
     const tx = mobile ? W * 0.5 - tw / 2 : W * 0.68 - tw / 2;
     const ty = hor - th;
     drawTower(s, tx, ty, tw, th, hor);
@@ -252,10 +252,10 @@
         if (winSeed[idx] >= s.lit) continue;
         const px = gx + c * gw, py = gy + f * gh;
         const warmth = 0.85 + 0.15 * Math.sin(idx * 3.1);
-        const a = 0.35 + 0.6 * s.night;
+        const a = 0.3 + 0.45 * s.night;
         const lg = ctx.createLinearGradient(0, py, 0, py + gh);
-        lg.addColorStop(0, `rgba(255,${(226 * warmth) | 0},${(178 * warmth) | 0},${a})`);
-        lg.addColorStop(1, `rgba(255,${(186 * warmth) | 0},${(120 * warmth) | 0},${a * 0.75})`);
+        lg.addColorStop(0, `rgba(255,${(232 * warmth) | 0},${(196 * warmth) | 0},${a})`);
+        lg.addColorStop(1, `rgba(240,${(196 * warmth) | 0},${(140 * warmth) | 0},${a * 0.55})`);
         ctx.fillStyle = lg; ctx.fillRect(px, py, gw, gh);
       }
     }
