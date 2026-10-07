@@ -166,8 +166,8 @@
     // brzeg: cienka linia, wygaszona pod tekstem po lewej
     const shore = ctx.createLinearGradient(0, 0, W, 0);
     const shoreCol = mixC(mixC(s.sea, dark, 0.6), [4, 6, 12], s.night);
-    shore.addColorStop(0, rgb(shoreCol, 0)); shore.addColorStop(mobile ? 0.05 : 0.45, rgb(shoreCol, 0)); shore.addColorStop(mobile ? 0.2 : 0.55, rgb(shoreCol, 1)); shore.addColorStop(1, rgb(shoreCol, 1));
-    ctx.fillStyle = shore; ctx.fillRect(0, hor, W, 2);
+    shore.addColorStop(0, rgb(shoreCol, 0)); shore.addColorStop(0.45, rgb(shoreCol, 0)); shore.addColorStop(0.58, rgb(shoreCol, 1)); shore.addColorStop(1, rgb(shoreCol, 1));
+    if (!mobile) { ctx.fillStyle = shore; ctx.fillRect(0, hor, W, 2); }
 
     // morze
     const sg2 = ctx.createLinearGradient(0, hor, 0, H);
@@ -317,23 +317,34 @@
     ctx.fillStyle = rgb(mixC(fin, dark, 0.35), 0.75);
     for (let c = 1; c < COLS; c++) ctx.fillRect(gx + c * gw - 0.6, gy, 1.2, ghei);
     // tarasy od 12. piętra: wysunięte płyty po stronie zachodniej + szklane balustrady
-    const tExt = w * 0.09;
-    for (let f = 0; f < FLOORS; f++) {
-      const fromBottom = FLOORS - 1 - f;
-      if (fromBottom < TERRACE_FROM || fromBottom % 2) continue;
-      const slabY = gy + (f + 1) * gh;
-      ctx.fillStyle = rgb(mixC(s.mid, s.top, 0.3), 0.35); ctx.fillRect(x - tExt, slabY - gh * 0.42, tExt + pad, gh * 0.42);
-      ctx.fillStyle = rgb(fin); ctx.fillRect(x - tExt, slabY - 1.5, tExt + pad + 2, 3);
-      ctx.fillStyle = rgb(mixC(fin, dark, 0.3)); ctx.fillRect(x - tExt, slabY - gh * 0.42, 1.2, gh * 0.42);
-    }
     // narożne pilastry
     ctx.fillStyle = rgb(fin); ctx.fillRect(x, gy, pad, ghei); ctx.fillRect(x + w - pad, gy, pad, ghei);
-    // modelowanie światłem
+    // modelowanie światłem — tylko w obrysie bryły (bez prostokąta wokół wieży)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, gy, w, ghei);
+    ctx.moveTo(x + w, gy); ctx.lineTo(x + w + sw, gy + sw * 0.25); ctx.lineTo(x + w + sw, hor); ctx.lineTo(x + w, hor); ctx.closePath();
+    ctx.rect(x + w * 0.06, y + crown * 0.45, w * 0.88, crown * 0.55);
+    ctx.rect(x + w * 0.16, y + crown * 0.05, w * 0.68, crown * 0.4);
+    ctx.clip();
     const side = ctx.createLinearGradient(x, 0, x + w, 0);
     const lightLeft = s.sunX < 0.5;
     side.addColorStop(0, `rgba(0,0,0,${lightLeft ? 0 : 0.22})`); side.addColorStop(1, `rgba(0,0,0,${lightLeft ? 0.22 : 0})`);
-    ctx.fillStyle = side; ctx.fillRect(x - tExt, y, w + tExt, h);
-    if (s.warm > 0.5 && s.sun > -0.1) { ctx.fillStyle = `rgba(255,150,70,${0.12 * s.warm})`; ctx.fillRect(x - tExt, y, w + tExt + sw, h); }
+    ctx.fillStyle = side; ctx.fillRect(x, y, w, h);
+    if (s.warm > 0.5 && s.sun > -0.1) { ctx.fillStyle = `rgba(255,150,70,${0.12 * s.warm})`; ctx.fillRect(x, y, w + sw, h); }
+    ctx.restore();
+    // tarasy od 12. piętra co 3 kondygnacje: głębokie płyty, przyciemnione szkło, poręcz
+    const tExt = w * 0.13;
+    for (let f = 0; f < FLOORS; f++) {
+      const fromBottom = FLOORS - 1 - f;
+      if (fromBottom < TERRACE_FROM || fromBottom % 3) continue;
+      const slabY = gy + (f + 1) * gh, bh = gh * 0.55;
+      ctx.fillStyle = rgb(mixC(mixC(s.mid, s.top, 0.3), dark, 0.25), 0.55); ctx.fillRect(x - tExt, slabY - bh, tExt, bh);
+      ctx.fillStyle = rgb(mixC(fin, [255, 255, 255], 0.2)); ctx.fillRect(x - tExt, slabY - bh - 1, tExt, 1.6);
+      ctx.fillStyle = rgb(fin); ctx.fillRect(x - tExt - 2, slabY - 2, tExt + 2, 4);
+      ctx.fillStyle = rgb(mixC(fin, dark, 0.45)); ctx.fillRect(x - tExt - 2, slabY + 2, tExt + 2, 2);
+      ctx.fillRect(x - tExt, slabY - bh, 1.4, bh);
+    }
   }
 
   // HUD + rozdziały
