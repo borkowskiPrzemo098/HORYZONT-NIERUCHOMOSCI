@@ -211,7 +211,7 @@
     ctx.fillStyle = rgb(mixC(facade, [0, 0, 0], 0.15)); ctx.fillRect(wx, hor - wh, ww, wh);
     for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) {
       const lit = winSeed[(r * 9 + c) % winSeed.length] < s.lit * 1.1;
-      ctx.fillStyle = lit ? `rgba(255,208,140,${0.6 + 0.35 * s.night})` : rgb(mixC(s.mid, s.top, 0.5), 0.8);
+      ctx.fillStyle = lit ? `rgba(255,214,160,${0.35 + 0.3 * s.night})` : rgb(mixC(s.mid, s.top, 0.5), 0.8);
       ctx.fillRect(wx + 6 + c * (ww - 12) / 9, hor - wh + 6 + r * (wh - 10) / 4, (ww - 12) / 9 - 4, (wh - 10) / 4 - 5);
     }
     // korpus
