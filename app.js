@@ -355,13 +355,18 @@
     }
   })();
   const ST = { free: ['dostępny', 'st-free'], held: ['rezerwacja', 'st-held'], sold: ['sprzedany', 'st-sold'] };
-  const fstate = { rooms: 'all', onlyFree: true };
+  const fstate = { rooms: 'all', onlyFree: true, all: false };
+  const isPhone = () => window.innerWidth <= 640;
   let current = null;
   const tbody = $('#unitRows');
 
   function renderUnits() {
     const list = UNITS.filter(u => (fstate.rooms === 'all' || (fstate.rooms === '4' ? u.rooms >= 4 : u.rooms === Number(fstate.rooms))) && (!fstate.onlyFree || u.status === 'free'));
-    tbody.innerHTML = list.map(u => `<tr data-id="${u.id}"${current && current.id === u.id ? ' class="is-on"' : ''}>
+    const shown = (isPhone() && !fstate.all) ? list.slice(0, 8) : list;
+    const more = document.getElementById('moreUnits');
+    more.hidden = shown.length === list.length;
+    more.textContent = `Pokaż wszystkie (${list.length})`;
+    tbody.innerHTML = shown.map(u => `<tr data-id="${u.id}"${current && current.id === u.id ? ' class="is-on"' : ''}>
       <td><button type="button" class="rowbtn" aria-label="Pokaż rzut lokalu ${u.id}">${u.id}</button></td><td>${u.floor}</td><td>${u.rooms}</td><td>${u.area.toFixed(1).replace('.', ',')} m²</td>
       <td>${zl(u.price)}</td><td><span class="status ${ST[u.status][1]}">${ST[u.status][0]}</span></td>
       <td class="meta">piętro ${u.floor} · ${u.rooms} pok. · ${u.area.toFixed(1).replace('.', ',')} m²</td></tr>`).join('');
@@ -395,7 +400,13 @@
     const ask = $('#planAsk');
     ask.textContent = u.status === 'sold' ? 'Zapytaj o podobny apartament' : 'Zapytaj o ten apartament';
   }
-  tbody.addEventListener('click', e => { const tr = e.target.closest('tr[data-id]'); if (tr) showUnit(UNITS.find(u => u.id === tr.dataset.id)); });
+  tbody.addEventListener('click', e => {
+    const tr = e.target.closest('tr[data-id]');
+    if (!tr) return;
+    showUnit(UNITS.find(u => u.id === tr.dataset.id));
+    if (window.innerWidth <= 1000) $('#plan').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  });
+  $('#moreUnits').addEventListener('click', () => { fstate.all = true; renderUnits(); });
   $$('.filters .fchip').forEach(b => b.addEventListener('click', () => {
     fstate.rooms = b.dataset.rooms;
     $$('.filters .fchip').forEach(x => { const on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', String(on)); });
