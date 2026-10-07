@@ -151,7 +151,7 @@
 
     // wieża
     const tw = Math.min(W * (mobile ? 0.36 : 0.19), 340);
-    const th = Math.min(H * (mobile ? 0.46 : 0.58), tw * 3.2);
+    const th = Math.min(H * (mobile ? 0.37 : 0.58), tw * 3.2);
     const tx = mobile ? W * 0.46 - tw / 2 : W * 0.6 - tw / 2;
     drawTower(s, tx, hor - th, tw, th, hor, dark);
 
