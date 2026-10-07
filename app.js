@@ -252,11 +252,12 @@
         if (winSeed[idx] >= s.lit) continue;
         const px = gx + c * gw, py = gy + f * gh;
         const warmth = 0.85 + 0.15 * Math.sin(idx * 3.1);
-        const a = 0.3 + 0.45 * s.night;
+        const dim = 0.45 + 0.55 * winSeed[(idx * 7 + 3) % winSeed.length];
+        const a = (0.3 + 0.45 * s.night) * dim;
         const lg = ctx.createLinearGradient(0, py, 0, py + gh);
         lg.addColorStop(0, `rgba(255,${(232 * warmth) | 0},${(196 * warmth) | 0},${a})`);
         lg.addColorStop(1, `rgba(240,${(196 * warmth) | 0},${(140 * warmth) | 0},${a * 0.55})`);
-        ctx.fillStyle = lg; ctx.fillRect(px, py, gw, gh);
+        ctx.fillStyle = lg; ctx.fillRect(px + 2, py + 2.5, gw - 4, gh - 5);
       }
     }
     // stropy (białe krawędzie płyt) i cienkie szprosy
