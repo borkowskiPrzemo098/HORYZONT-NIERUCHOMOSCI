@@ -257,7 +257,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   .scene { height: 520vh; }
   .scene__shade { background: linear-gradient(0deg, rgba(6, 9, 16, .9) 0%, rgba(6, 9, 16, .55) 42%, rgba(6, 9, 16, 0) 68%), linear-gradient(180deg, rgba(6, 9, 16, .45) 0%, rgba(6, 9, 16, 0) 22%); }
   .scene__ui { grid-template-columns: minmax(0, 1fr); align-content: space-between; padding-bottom: 28px; }
-  .hud { order: -1; align-self: start; text-align: left; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; min-width: 0; }
+  .hud { order: -1; align-self: start; margin-top: 0; text-align: left; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; min-width: 0; }
   .hud__time { font-size: 36px; }
   .hud__weather { margin: 0; font-size: 14px; }
   .hud__rail { grid-auto-flow: column; justify-items: start; gap: 0; width: 100%; margin-top: 6px; }
