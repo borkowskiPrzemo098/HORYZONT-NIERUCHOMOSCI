@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pl">
 <head>
 <meta charset="utf-8">
@@ -12,15 +12,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;100,500;100,600;125,500;125,600;125,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=4">
-</head>
+<link rel="stylesheet" href="style.css?v=2">
+<style>.scene{display:none}</style></head>
 <body>
 <!--
 THESIS: Budynek pokazany w czasie, nie na jednym renderze — scroll to zegar: świt, południe, złota godzina, deszcz, noc; odrzuca statyczny hero "wizualizacja + przycisk".
 OWN-WORLD: nocny granat #0a0f1a / grafit #121a2a, mosiądz #c9a46a (linie, przyciski, cyfry), ciepła biel #ece6da. Archivo 125% wersalikami, cyfry tabelaryczne jak na planie architekta. Znak: horyzont z półkolem słońca. Ostre krawędzie, cienkie mosiężne linie, karty jako arkusze specyfikacji.
 STORY: gość widzi budynek w pięciu warunkach, rozumie, co daje lokalizacja i standard, wybiera apartament z tabeli, liczy ratę, umawia prezentację.
 FIRST VIEWPORT: pełnoekranowa scena canvas (świt nad zatoką, wieża z odbiciem w wodzie); po lewej nagłówek wersalikami, lead, mosiężny przycisk "Wybierz apartament"; po prawej HUD: zegar, pogoda, 5 punktów pory dnia.
-FORM: forma podyktowana przez użytkownika (PRODUCT.md, 2026-10-08: scena pory dnia/pogody przy scrollu) — losowanie kierunku pominięte; przepis AMBRA w ciemnej odmianie; sygnatura: proceduralna scena canvas sterowana scrollem + tabela lokali z planem.
+FORM: kierunek wskazany przez użytkownika (scena pory dnia), przepis AMBRA w ciemnej odmianie; sygnatura: proceduralna scena canvas sterowana scrollem + tabela lokali z planem.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 -->
 <a class="skip" href="#apartamenty">Przejdź do apartamentów</a>
@@ -59,29 +59,29 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           </div>
         </article>
         <article class="chapter" data-at="1">
+          <span class="chip">Ekspozycja wschód–zachód</span>
           <h2>Świt od strony zatoki</h2>
           <p>Salony na osi wschodniej łapią pierwsze słońce już o&nbsp;5:40 w&nbsp;czerwcu. Mgła nad wodą znika, zanim zrobisz kawę.</p>
-          <p class="chapter__fact"><b>5:40</b> pierwsze słońce w salonie (czerwiec)</p>
         </article>
         <article class="chapter" data-at="2">
+          <span class="chip">3,1 m wysokości pomieszczeń</span>
           <h2>Światło przez cały dzień</h2>
           <p>Przeszklenia od podłogi do sufitu i&nbsp;szkło o&nbsp;niskiej refleksyjności. W&nbsp;południe mieszkanie jest jasne, ale nie przegrzane.</p>
-          <p class="chapter__fact"><b>3,1 m</b> wysokości pomieszczeń</p>
         </article>
         <article class="chapter" data-at="3">
+          <span class="chip">Tarasy do 64 m²</span>
           <h2>Zachód nad Kępą Redłowską</h2>
           <p>Każdy apartament od 12. piętra ma taras od strony zachodniej. Złota godzina trwa tu dłużej, bo nic nie zasłania horyzontu.</p>
-          <p class="chapter__fact"><b>64 m²</b> tarasu od strony zachodu</p>
         </article>
         <article class="chapter" data-at="4">
+          <span class="chip">Izolacyjność akustyczna 45 dB</span>
           <h2>Kiedy pogoda się psuje</h2>
           <p>Potrójne szyby, cicha wentylacja z&nbsp;rekuperacją i&nbsp;garaż z&nbsp;windą prosto na piętro. Deszcz oglądasz, ale go nie słyszysz.</p>
-          <p class="chapter__fact"><b>45 dB</b> izolacji akustycznej okien</p>
         </article>
         <article class="chapter" data-at="5">
+          <span class="chip">Concierge 24/7</span>
           <h2>Wieczór w&nbsp;Latarni</h2>
           <p>Oświetlony bulwar, recepcja całą dobę i&nbsp;światła Gdyni odbite w&nbsp;wodzie. Na dachu taras widokowy dla mieszkańców.</p>
-          <p class="chapter__fact"><b>24/7</b> concierge i ochrona</p>
           <div class="chapter__cta">
             <a class="btn btn--gold btn--lg" href="#apartamenty">Zobacz wolne apartamenty</a>
           </div>
@@ -98,9 +98,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           <li><button type="button" data-p="0.74">Deszcz</button></li>
           <li><button type="button" data-p="0.95">Noc</button></li>
         </ol>
-        <p class="hud__hint" id="hint" aria-hidden="true">Przewiń, żeby zmienić porę dnia</p>
       </aside>
     </div>
+    <p class="scene__hint" id="hint" aria-hidden="true">Przewiń, żeby zmienić porę dnia</p>
   </div>
 </section>
 
@@ -172,12 +172,12 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </div>
     </div>
     <div class="ogrid" id="ogrid">
-      <article class="offer" data-kind="dom"><img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=900&q=75" alt="Biała willa z basenem i drewnianym zadaszeniem" loading="lazy"><div class="offer__body"><h3>Willa z&nbsp;basenem przy Haffnera</h3><p class="offer__loc">Sopot · Dolny</p><ul><li>320 m²</li><li>6 pokoi</li><li>działka 900 m²</li></ul><p class="offer__price">6 450 000 zł</p></div></article>
-      <article class="offer" data-kind="apt"><img src="https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=900&q=75" alt="Penthouse z przeszkleniami i schodami" loading="lazy"><div class="offer__body"><h3>Penthouse z&nbsp;widokiem na port</h3><p class="offer__loc">Gdynia · Śródmieście</p><ul><li>164 m²</li><li>4 pokoje</li><li>2 tarasy</li></ul><p class="offer__price">3 890 000 zł</p></div></article>
-      <article class="offer" data-kind="dom"><img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=900&q=75" alt="Nowoczesny dom z basenem o zachodzie" loading="lazy"><div class="offer__body"><h3>Dom na klifie</h3><p class="offer__loc">Gdynia · Orłowo</p><ul><li>280 m²</li><li>5 pokoi</li><li>widok na morze</li></ul><p class="offer__price">7 200 000 zł</p></div></article>
-      <article class="offer" data-kind="apt"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=75" alt="Jasny salon z otwartą kuchnią" loading="lazy"><div class="offer__body"><h3>Apartament nad Motławą</h3><p class="offer__loc">Gdańsk · Wyspa Spichrzów</p><ul><li>96 m²</li><li>3 pokoje</li><li>garaż</li></ul><p class="offer__price">2 150 000 zł</p></div></article>
-      <article class="offer" data-kind="dom"><img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=900&q=75" alt="Ciemna nowoczesna elewacja domu" loading="lazy"><div class="offer__body"><h3>Dom w&nbsp;zabudowie bliźniaczej</h3><p class="offer__loc">Gdynia · Kamienna Góra</p><ul><li>210 m²</li><li>5 pokoi</li><li>ogród 300 m²</li></ul><p class="offer__price">3 400 000 zł</p></div></article>
-      <article class="offer" data-kind="apt"><img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=900&q=75" alt="Loft z antresolą i dużymi oknami" loading="lazy"><div class="offer__body"><h3>Loft z&nbsp;antresolą</h3><p class="offer__loc">Sopot · Kamienny Potok</p><ul><li>118 m²</li><li>3 pokoje</li><li>5 min do plaży</li></ul><p class="offer__price">2 680 000 zł</p></div></article>
+      <article class="offer" data-kind="dom"><img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=900&q=75" alt="Biała willa z basenem i drewnianym zadaszeniem" loading="lazy"><div class="offer__body"><p class="offer__loc">Sopot · Dolny</p><h3>Willa z&nbsp;basenem przy Haffnera</h3><ul><li>320 m²</li><li>6 pokoi</li><li>działka 900 m²</li></ul><p class="offer__price">6 450 000 zł</p></div></article>
+      <article class="offer" data-kind="apt"><img src="https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=900&q=75" alt="Penthouse z przeszkleniami i schodami" loading="lazy"><div class="offer__body"><p class="offer__loc">Gdynia · Śródmieście</p><h3>Penthouse z&nbsp;widokiem na port</h3><ul><li>164 m²</li><li>4 pokoje</li><li>2 tarasy</li></ul><p class="offer__price">3 890 000 zł</p></div></article>
+      <article class="offer" data-kind="dom"><img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=900&q=75" alt="Nowoczesny dom z basenem o zachodzie" loading="lazy"><div class="offer__body"><p class="offer__loc">Gdynia · Orłowo</p><h3>Dom na klifie</h3><ul><li>280 m²</li><li>5 pokoi</li><li>widok na morze</li></ul><p class="offer__price">7 200 000 zł</p></div></article>
+      <article class="offer" data-kind="apt"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=75" alt="Jasny salon z otwartą kuchnią" loading="lazy"><div class="offer__body"><p class="offer__loc">Gdańsk · Wyspa Spichrzów</p><h3>Apartament nad Motławą</h3><ul><li>96 m²</li><li>3 pokoje</li><li>garaż</li></ul><p class="offer__price">2 150 000 zł</p></div></article>
+      <article class="offer" data-kind="dom"><img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=900&q=75" alt="Ciemna nowoczesna elewacja domu" loading="lazy"><div class="offer__body"><p class="offer__loc">Gdynia · Kamienna Góra</p><h3>Dom w&nbsp;zabudowie bliźniaczej</h3><ul><li>210 m²</li><li>5 pokoi</li><li>ogród 300 m²</li></ul><p class="offer__price">3 400 000 zł</p></div></article>
+      <article class="offer" data-kind="apt"><img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=900&q=75" alt="Loft z antresolą i dużymi oknami" loading="lazy"><div class="offer__body"><p class="offer__loc">Sopot · Kamienny Potok</p><h3>Loft z&nbsp;antresolą</h3><ul><li>118 m²</li><li>3 pokoje</li><li>5 min do plaży</li></ul><p class="offer__price">2 680 000 zł</p></div></article>
     </div>
   </div>
 </section>
@@ -273,6 +273,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 <a class="fab" href="#kontakt" id="fab">Umów prezentację</a>
 
-<script src="app.js?v=7"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
+

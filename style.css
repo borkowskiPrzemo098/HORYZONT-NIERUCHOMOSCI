@@ -75,7 +75,8 @@ section:not(.scene) { padding-block: clamp(72px, 9vw, 130px); }
 .chapter h2 { font-size: clamp(28px, 3.4vw, 50px); font-weight: 600; line-height: 1.05; text-transform: uppercase; margin: 14px 0 16px; }
 .chapter p { font-size: clamp(17px, 1.3vw, 19px); color: #f1ece2; max-width: 44ch; margin: 0; }
 .chapter__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; text-shadow: none; }
-.chip { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--night); background: var(--brass); padding: 6px 12px; text-shadow: none; }
+.chapter__fact { margin: 22px 0 0 !important; padding-top: 16px; border-top: 1px solid rgba(201, 164, 106, .55); font-size: 15px !important; color: #e3dccf !important; max-width: 40ch; }
+.chapter__fact b { display: block; font-size: 30px; font-weight: 600; font-stretch: 125%; color: var(--brass-hi); line-height: 1.1; margin-bottom: 2px; }
 .hud { align-self: end; text-align: right; color: var(--text); text-shadow: 0 2px 14px rgba(0, 0, 0, .5); min-width: 220px; }
 .hud__time { margin: 0; font-size: clamp(44px, 5vw, 76px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .hud__weather { margin: 8px 0 22px; font-size: 15px; color: #e3dccf; }
@@ -85,10 +86,9 @@ section:not(.scene) { padding-block: clamp(72px, 9vw, 130px); }
 .hud__rail button:hover { color: var(--text); }
 .hud__rail button.is-on { color: var(--brass-hi); }
 .hud__rail button.is-on::after { background: var(--brass-hi); transform: scale(1.25); }
-.scene__hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); margin: 0; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: rgba(236, 230, 218, .8); transition: opacity .4s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.scene__hint::after { content: ""; width: 1.5px; height: 28px; background: linear-gradient(var(--brass), transparent); animation: drip 1.8s var(--ease) infinite; }
+.hud__hint { margin: 14px 0 0; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: rgba(236, 230, 218, .75); transition: opacity .4s; }
+.hud__hint.is-hidden { opacity: 0; }
 @keyframes drip { from { transform: scaleY(0); transform-origin: top; } to { transform: scaleY(1); transform-origin: top; } }
-.scene__hint.is-hidden { opacity: 0; }
 
 /* investment */
 .inv { background: var(--night); border-top: 1px solid var(--line); }
@@ -118,7 +118,8 @@ section:not(.scene) { padding-block: clamp(72px, 9vw, 130px); }
 .utable td { padding: 15px 16px; border-top: 1px solid var(--line); font-size: 16px; }
 .utable tr[data-id] { cursor: pointer; transition: background-color .15s; }
 .utable tr[data-id]:hover { background: rgba(201, 164, 106, .08); }
-.utable tr.is-on { background: rgba(201, 164, 106, .16); box-shadow: inset 3px 0 0 var(--brass); }
+.utable tr.is-on { background: rgba(201, 164, 106, .16); }
+.utable tr.is-on td:first-child, .utable tr.is-on .rowbtn { color: var(--brass-hi); }
 .utable td:first-child { font-weight: 600; }
 .utable td.meta { display: none; }
 .utable button.rowbtn { all: unset; cursor: pointer; font-weight: 600; }
@@ -156,8 +157,8 @@ section:not(.scene) { padding-block: clamp(72px, 9vw, 130px); }
 .offer img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: transform .8s var(--ease); }
 .offer:hover img { transform: scale(1.04); }
 .offer__body { padding: 20px 22px 24px; }
-.offer__loc { margin: 0; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--brass-hi); }
-.offer h3 { margin: 6px 0 12px; font-size: 20px; font-weight: 600; line-height: 1.25; }
+.offer__loc { margin: -6px 0 12px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--brass-hi); }
+.offer h3 { margin: 0 0 10px; font-size: 20px; font-weight: 600; line-height: 1.25; }
 .offer ul { list-style: none; padding: 0; margin: 0 0 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14.5px; color: var(--muted); }
 .offer__price { margin: 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .offer[hidden] { display: none; }
@@ -260,14 +261,15 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   .hud__time { font-size: 36px; }
   .hud__weather { margin: 0; font-size: 14px; }
   .hud__rail { grid-auto-flow: column; justify-items: start; gap: 0; width: 100%; margin-top: 6px; }
-  .hud__rail button { font-size: 0; padding: 10px 6px 10px 0; }
-  .hud__rail button::after { width: 11px; height: 11px; }
+  .hud__rail button { font-size: 0; min-width: 44px; min-height: 44px; padding: 0; justify-content: flex-start; gap: 8px; }
+  .hud__rail button.is-on { font-size: 13px; min-width: auto; padding-right: 12px; }
+  .hud__rail button::after { width: 12px; height: 12px; order: -1; }
   .chapters { min-height: 300px; }
   .chapter h1 { font-size: clamp(30px, 8.6vw, 40px); }
   .chapter h2 { font-size: clamp(26px, 7.4vw, 34px); }
   .chapter__cta { flex-direction: column; }
   .chapter__cta .btn { width: 100%; }
-  .scene__hint { display: none; }
+  .hud__hint { display: none; }
   .spec { grid-template-columns: minmax(0, 1fr); }
   .spec div:nth-child(odd), .spec div:nth-child(even) { padding: 16px 0; border-left: 0; }
   .toggle { margin-left: 0; width: 100%; margin-top: 6px; }

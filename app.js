@@ -46,13 +46,15 @@
   // stałe losowe (deterministyczne)
   let seed = 7;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const FLOORS = 28, COLS = 5;
-  const winSeed = Array.from({ length: FLOORS * COLS }, () => rnd());
-  const stars = Array.from({ length: 140 }, () => [rnd(), rnd() * 0.6, rnd() * 1.4 + 0.3, rnd()]);
-  const city = Array.from({ length: 46 }, (_, i) => [i / 46, 0.02 + rnd() * 0.07, rnd()]);
-  const clouds = Array.from({ length: 9 }, () => [rnd(), 0.06 + rnd() * 0.3, 0.12 + rnd() * 0.22, rnd()]);
-  const drops = Array.from({ length: 260 }, () => [rnd(), rnd(), 0.6 + rnd() * 0.8]);
-  const cityWin = Array.from({ length: 300 }, () => [rnd(), rnd(), rnd()]);
+  const FLOORS = 30, COLS = 6, SIDE = 2, TERRACE_FROM = 12;
+  const winSeed = Array.from({ length: FLOORS * (COLS + SIDE) }, () => rnd());
+  const stars = Array.from({ length: 160 }, () => [rnd(), rnd() * 0.62, rnd() * 1.4 + 0.3, rnd()]);
+  const clouds = Array.from({ length: 10 }, () => [rnd(), 0.05 + rnd() * 0.32, 0.14 + rnd() * 0.24, rnd()]);
+  const drops = Array.from({ length: 320 }, () => [rnd(), rnd(), 0.6 + rnd() * 0.8]);
+  // daleka panorama Gdyni: różne szerokości i wysokości, tylko po lewej
+  const skyline = [];
+  for (let x = 0; x < 0.5;) { const w = 0.006 + rnd() * 0.022; skyline.push([x, w, 0.012 + Math.pow(rnd(), 2) * 0.07, rnd()]); x += w + rnd() * 0.004; }
+  const ships = Array.from({ length: 3 }, (_, i) => [0.1 + i * 0.28 + rnd() * 0.1, 0.06 + rnd() * 0.18, 0.4 + rnd() * 0.6]);
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -64,14 +66,15 @@
   function draw() {
     const s = stateAt(progress);
     const mobile = W < 700;
-    const hor = Math.round(H * (mobile ? 0.66 : 0.7));
+    const hor = Math.round(H * (mobile ? 0.64 : 0.7));
+    const dark = [8, 11, 20];
 
     // niebo
     const g = ctx.createLinearGradient(0, 0, 0, hor);
     g.addColorStop(0, rgb(s.top)); g.addColorStop(0.55, rgb(s.mid)); g.addColorStop(1, rgb(s.hor));
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, hor + 1);
 
-    // gwiazdy
+    // gwiazdy i księżyc
     if (s.night > 0.4) {
       const a = (s.night - 0.4) / 0.6 * (1 - s.cloud * 0.8);
       for (const st of stars) {
@@ -79,67 +82,78 @@
         ctx.fillStyle = `rgba(255,248,230,${a * tw * 0.9})`;
         ctx.fillRect(st[0] * W, st[1] * hor, st[2], st[2]);
       }
-      // księżyc
-      const mx = W * (mobile ? 0.78 : 0.22), my = hor * 0.2;
-      const mg = ctx.createRadialGradient(mx, my, 0, mx, my, 90);
-      mg.addColorStop(0, `rgba(240,236,220,${0.35 * a})`); mg.addColorStop(1, 'rgba(240,236,220,0)');
-      ctx.fillStyle = mg; ctx.fillRect(mx - 90, my - 90, 180, 180);
-      ctx.fillStyle = `rgba(246,242,228,${a})`;
-      ctx.beginPath(); ctx.arc(mx, my, 16, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = rgb(s.top, a); ctx.beginPath(); ctx.arc(mx + 7, my - 4, 14, 0, Math.PI * 2); ctx.fill();
+      const mx = W * (mobile ? 0.8 : 0.24), my = hor * 0.18;
+      const mg = ctx.createRadialGradient(mx, my, 0, mx, my, 110);
+      mg.addColorStop(0, `rgba(240,236,220,${0.3 * a})`); mg.addColorStop(1, 'rgba(240,236,220,0)');
+      ctx.fillStyle = mg; ctx.fillRect(mx - 110, my - 110, 220, 220);
+      ctx.fillStyle = `rgba(246,242,228,${a})`; ctx.beginPath(); ctx.arc(mx, my, 15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = rgb(s.top, a); ctx.beginPath(); ctx.arc(mx + 7, my - 4, 13.5, 0, Math.PI * 2); ctx.fill();
     }
 
     // słońce
     if (s.sun > -0.15) {
       const sx = W * s.sunX, sy = hor - Math.max(-0.1, s.sun) * hor * 0.82;
-      const r = 26 + (1 - Math.min(1, s.sun)) * 14;
-      const warm = s.warm;
-      const col = mixC([255, 248, 225], [255, 170, 90], warm);
-      const sg = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 9);
-      sg.addColorStop(0, rgb(col, 0.55 * (1 - s.cloud * 0.6)));
-      sg.addColorStop(1, rgb(col, 0));
-      ctx.fillStyle = sg; ctx.fillRect(sx - r * 9, sy - r * 9, r * 18, r * 18);
-      ctx.fillStyle = rgb(mixC([255, 252, 238], [255, 196, 120], warm), 1 - s.cloud * 0.7);
+      const r = 24 + (1 - Math.min(1, s.sun)) * 14;
+      const col = mixC([255, 248, 225], [255, 170, 90], s.warm);
+      const sg = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 10);
+      sg.addColorStop(0, rgb(col, 0.55 * (1 - s.cloud * 0.6))); sg.addColorStop(1, rgb(col, 0));
+      ctx.fillStyle = sg; ctx.fillRect(sx - r * 10, sy - r * 10, r * 20, r * 20);
+      ctx.fillStyle = rgb(mixC([255, 252, 238], [255, 196, 120], s.warm), 1 - s.cloud * 0.7);
       ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
     }
 
     // chmury
     const cloudCol = mixC(mixC(s.hor, [255, 255, 255], 0.35 * s.light), [40, 46, 58], s.rain * 0.7 + s.night * 0.4);
     for (const c of clouds) {
-      const amount = s.cloud;
-      if (c[3] > amount + 0.1) continue;
+      if (c[3] > s.cloud + 0.1) continue;
       const x = ((c[0] + time * 0.000004 * (0.5 + c[3])) % 1.3 - 0.15) * W;
-      const y = c[1] * hor, w = c[2] * W * (0.8 + amount * 0.6), h = w * 0.22;
+      const y = c[1] * hor, w = c[2] * W * (0.8 + s.cloud * 0.6), h = w * 0.22;
       const cg = ctx.createRadialGradient(x, y, 0, x, y, w * 0.6);
-      cg.addColorStop(0, rgb(cloudCol, 0.55 * amount + 0.1)); cg.addColorStop(1, rgb(cloudCol, 0));
+      cg.addColorStop(0, rgb(cloudCol, 0.55 * s.cloud + 0.1)); cg.addColorStop(1, rgb(cloudCol, 0));
       ctx.save(); ctx.translate(x, y); ctx.scale(1, h / w); ctx.translate(-x, -y);
       ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(x, y, w * 0.6, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
     if (s.rain > 0) { ctx.fillStyle = rgb([34, 40, 52], s.rain * 0.45); ctx.fillRect(0, 0, W, hor); }
 
-    // panorama miasta na horyzoncie
-    const cityCol = mixC(mixC(s.hor, [20, 26, 40], 0.55), [8, 12, 22], s.night);
-    ctx.fillStyle = rgb(cityCol);
-    for (const b of city) {
-      const bx = b[0] * W, bw = W / 46 + 1, bh = b[1] * H * (mobile ? 0.7 : 1);
-      if (bx > W * 0.55 && bx < W * 0.85 && !mobile) continue;
-      ctx.fillRect(bx, hor - bh, bw, bh);
-    }
-    if (s.night > 0.3) {
-      for (const w of cityWin) {
-        if (w[2] > s.lit) continue;
-        const bx = w[0] * W; if (bx > W * 0.55 && bx < W * 0.85 && !mobile) continue;
-        ctx.fillStyle = `rgba(255,214,150,${0.7 * s.night})`;
-        ctx.fillRect(bx, hor - w[1] * H * 0.06 - 2, 1.6, 1.6);
-      }
+    // błyskawica w deszczu
+    const flashPhase = (time % 6800) / 6800;
+    const flash = s.rain > 0.6 && !reduce && flashPhase < 0.03 ? (1 - flashPhase / 0.03) * s.rain : 0;
+    if (flash > 0) {
+      ctx.fillStyle = `rgba(220,228,255,${0.28 * flash})`; ctx.fillRect(0, 0, W, hor);
+      ctx.strokeStyle = `rgba(240,244,255,${0.9 * flash})`; ctx.lineWidth = 1.6; ctx.beginPath();
+      let bx = W * 0.32, by = 0; ctx.moveTo(bx, by);
+      for (let i = 0; i < 9; i++) { bx += (winSeed[i] - 0.5) * 40; by += hor * 0.075; ctx.lineTo(bx, by); }
+      ctx.stroke();
     }
 
+    // panorama Gdyni (lewa strona, za mgłą)
+    const haze = Math.min(1, 0.35 + s.fog * 0.5);
+    const skyCol = mixC(mixC(s.hor, dark, 0.45), s.hor, haze * 0.5);
+    const skyN = mixC(skyCol, [6, 9, 18], s.night * 0.85);
+    ctx.fillStyle = rgb(skyN);
+    for (const b of skyline) ctx.fillRect(b[0] * W, hor - b[2] * H, b[1] * W, b[2] * H);
+    if (s.night > 0.3) {
+      ctx.fillStyle = `rgba(255,214,150,${0.65 * s.night})`;
+      for (const b of skyline) for (let k = 0; k < 3; k++) if (winSeed[(b[3] * 97 + k * 13) | 0] < s.lit) ctx.fillRect((b[0] + b[1] * (0.2 + k * 0.25)) * W, hor - b[2] * H * (0.3 + k * 0.2), 1.5, 1.5);
+    }
+
+    // Kępa Redłowska: klif z linią drzew po prawej
+    const kx = W * (mobile ? 0.72 : 0.8), kTop = hor - H * (mobile ? 0.1 : 0.14);
+    const kCol = mixC(mixC(mixC([46, 62, 48], s.hor, 0.25), dark, 1 - s.light), s.hor, s.fog * 0.35);
+    ctx.fillStyle = rgb(kCol);
+    ctx.beginPath(); ctx.moveTo(kx - W * 0.06, hor);
+    ctx.bezierCurveTo(kx, hor - H * 0.02, kx + W * 0.02, kTop + H * 0.02, kx + W * 0.07, kTop);
+    ctx.lineTo(W, kTop - H * 0.01); ctx.lineTo(W, hor); ctx.closePath(); ctx.fill();
+    for (let i = 0; i < 26; i++) { const tx2 = kx + W * 0.05 + i * (W - kx) / 22; const r2 = 6 + winSeed[i] * 9; ctx.beginPath(); ctx.arc(tx2, kTop - H * 0.005 + winSeed[i + 30] * 4, r2, 0, Math.PI * 2); ctx.fill(); }
+    // jasna ściana klifu (piasek) w dzień
+    ctx.fillStyle = rgb(mixC([196, 170, 130], dark, 1 - s.light), 0.55);
+    ctx.beginPath(); ctx.moveTo(kx - W * 0.03, hor); ctx.bezierCurveTo(kx + W * 0.01, hor - H * 0.02, kx + W * 0.03, kTop + H * 0.03, kx + W * 0.07, kTop + H * 0.012); ctx.lineTo(kx + W * 0.08, hor); ctx.closePath(); ctx.fill();
+
     // wieża
-    const tw = Math.min(W * (mobile ? 0.4 : 0.17), 300);
-    const th = Math.min(H * (mobile ? 0.44 : 0.5), tw * 3.4);
-    const tx = mobile ? W * 0.5 - tw / 2 : W * 0.68 - tw / 2;
-    const ty = hor - th;
-    drawTower(s, tx, ty, tw, th, hor);
+    const tw = Math.min(W * (mobile ? 0.36 : 0.19), 340);
+    const th = Math.min(H * (mobile ? 0.46 : 0.58), tw * 3.2);
+    const tx = mobile ? W * 0.46 - tw / 2 : W * 0.6 - tw / 2;
+    drawTower(s, tx, hor - th, tw, th, hor, dark);
 
     // mgła
     if (s.fog > 0) {
@@ -149,131 +163,177 @@
       ctx.fillStyle = fg; ctx.fillRect(0, hor - H * 0.25, W, H * 0.25 + 10);
     }
 
-    // bulwar
-    ctx.fillStyle = rgb(mixC(mixC(s.sea, [10, 14, 22], 0.6), [4, 6, 12], s.night));
-    ctx.fillRect(0, hor, W, 6);
-    if (s.night > 0.2) {
-      for (let i = 0; i < 16; i++) {
-        const lx = (i + 0.5) / 16 * W;
-        const lg = ctx.createRadialGradient(lx, hor, 0, lx, hor, 22);
-        lg.addColorStop(0, `rgba(255,205,140,${0.7 * s.night})`); lg.addColorStop(1, 'rgba(255,205,140,0)');
-        ctx.fillStyle = lg; ctx.fillRect(lx - 22, hor - 22, 44, 44);
-      }
-    }
+    // brzeg: cienka linia, wygaszona pod tekstem po lewej
+    const shore = ctx.createLinearGradient(0, 0, W, 0);
+    const shoreCol = mixC(mixC(s.sea, dark, 0.6), [4, 6, 12], s.night);
+    shore.addColorStop(0, rgb(shoreCol, 0)); shore.addColorStop(mobile ? 0.05 : 0.45, rgb(shoreCol, 0)); shore.addColorStop(mobile ? 0.2 : 0.55, rgb(shoreCol, 1)); shore.addColorStop(1, rgb(shoreCol, 1));
+    ctx.fillStyle = shore; ctx.fillRect(0, hor, W, 2);
 
-    // morze + odbicie
+    // morze
     const sg2 = ctx.createLinearGradient(0, hor, 0, H);
     sg2.addColorStop(0, rgb(mixC(s.sea, s.hor, 0.35))); sg2.addColorStop(1, rgb(mixC(s.sea, [3, 6, 14], 0.55)));
-    ctx.fillStyle = sg2; ctx.fillRect(0, hor + 6, W, H - hor);
-    const seaH = H - hor - 6;
-    const step = 3;
-    ctx.globalAlpha = 0.42 - s.rain * 0.12;
+    ctx.fillStyle = sg2; ctx.fillRect(0, hor + 2, W, H - hor);
+    // odbicie: cienkie paski, malejąca widoczność w głąb
+    const seaH = H - hor - 2, step = mobile ? 2 : 1;
     for (let y = 0; y < seaH; y += step) {
-      const srcY = hor - y * 1.05 - 2;
+      const srcY = hor - y * 1.04 - 1;
       if (srcY < 0) break;
-      const amp = (1.2 + y * 0.05) * (1 + s.rain * 1.5);
-      const off = Math.sin(y * 0.18 + time * 0.0025) * amp;
-      ctx.drawImage(canvas, 0, srcY * DPR, W * DPR, step * DPR, off, hor + 6 + y, W, step);
+      const amp = (0.6 + y * 0.02) * (1 + s.rain * 1.8);
+      const off = Math.sin(y * 0.16 + time * 0.0022) * amp + Math.sin(y * 0.05 - time * 0.001) * amp * 0.6;
+      ctx.globalAlpha = (0.46 - s.rain * 0.14) * (1 - y / seaH * 0.75);
+      ctx.drawImage(canvas, 0, srcY * DPR, W * DPR, step * DPR, off, hor + 2 + y, W, step);
     }
     ctx.globalAlpha = 1;
     // połysk słońca na wodzie
     if (s.sun > -0.1 && s.light > 0.3) {
       const sx = W * s.sunX;
       for (let i = 0; i < 26; i++) {
-        const y = hor + 10 + i * i * 0.5;
-        if (y > H) break;
+        const y = hor + 8 + i * i * 0.5; if (y > H) break;
         const w = 30 + i * 6 + Math.sin(time * 0.003 + i) * 8;
         ctx.fillStyle = rgb(mixC([255, 250, 230], [255, 170, 90], s.warm), 0.22 * (1 - i / 26) * (1 - s.cloud * 0.6));
         ctx.fillRect(sx - w / 2, y, w, 1.5);
       }
     }
+    // molo w Orłowie: pomost wchodzący w wodę
+    const py = hor + seaH * 0.16, px0 = W * (mobile ? 0.62 : 0.74), px1 = W * (mobile ? 0.98 : 0.96);
+    const deck = mixC(mixC([150, 128, 98], dark, 1 - s.light * 0.9), s.hor, s.fog * 0.3);
+    ctx.fillStyle = rgb(deck); ctx.fillRect(px0, py, px1 - px0, 3);
+    ctx.fillStyle = rgb(mixC(deck, dark, 0.4));
+    for (let x = px0; x < px1; x += 14) ctx.fillRect(x, py + 3, 1.5, 7);
+    ctx.fillRect(px0 - 4, py - 6, 26, 6);
+    if (s.night > 0.25) for (let x = px0 + 8; x < px1; x += 34) {
+      const lg = ctx.createRadialGradient(x, py - 5, 0, x, py - 5, 14);
+      lg.addColorStop(0, `rgba(255,205,140,${0.85 * s.night})`); lg.addColorStop(1, 'rgba(255,205,140,0)');
+      ctx.fillStyle = lg; ctx.fillRect(x - 14, py - 19, 28, 28);
+      ctx.fillStyle = `rgba(255,200,130,${0.25 * s.night})`; ctx.fillRect(x - 0.75, py + 4, 1.5, 22);
+    }
+    // statki nocą
+    if (s.night > 0.5) for (const sh of ships) {
+      const x = ((sh[0] + time * 0.000006 * sh[2]) % 1) * W * (mobile ? 1 : 0.5), y = hor + 6 + sh[1] * seaH * 0.4;
+      ctx.fillStyle = `rgba(255,226,170,${(s.night - 0.5) * 1.6})`; ctx.fillRect(x, y, 2, 2); ctx.fillRect(x + 7, y + 1, 1.5, 1.5);
+      ctx.fillStyle = `rgba(255,210,150,${(s.night - 0.5) * 0.5})`; ctx.fillRect(x + 0.5, y + 3, 1, 10);
+    }
     // deszcz
     if (s.rain > 0.02) {
-      ctx.strokeStyle = `rgba(200,212,230,${0.35 * s.rain})`; ctx.lineWidth = 1;
-      ctx.beginPath();
+      ctx.strokeStyle = `rgba(200,212,230,${0.35 * s.rain})`; ctx.lineWidth = 1; ctx.beginPath();
       const n = Math.round(drops.length * s.rain * (mobile ? 0.5 : 1));
       for (let i = 0; i < n; i++) {
         const d = drops[i];
-        const x = (d[0] * W + time * 0.05 * d[2]) % W;
-        const y = (d[1] * H + time * 0.9 * d[2]) % H;
+        const x = (d[0] * W + time * 0.05 * d[2]) % W, y = (d[1] * H + time * 0.9 * d[2]) % H;
         ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 14 * d[2]);
       }
       ctx.stroke();
     }
+    if (flash > 0) { ctx.fillStyle = `rgba(220,228,255,${0.12 * flash})`; ctx.fillRect(0, hor, W, H - hor); }
   }
 
-  function drawTower(s, x, y, w, h, hor) {
-    const crown = h * 0.08;
-    const facade = mixC(mixC([214, 208, 196], s.hor, 0.25), [26, 30, 40], 1 - s.light);
-    const fin = mixC(facade, [255, 255, 255], 0.15 * s.light);
-    // skrzydło niskie
-    const ww = w * 1.25, wh = h * 0.2, wx = x - ww * 0.82;
-    ctx.fillStyle = rgb(mixC(facade, [0, 0, 0], 0.15)); ctx.fillRect(wx, hor - wh, ww, wh);
-    for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) {
-      const lit = winSeed[(r * 9 + c) % winSeed.length] < s.lit * 1.1;
-      ctx.fillStyle = lit ? `rgba(255,214,160,${0.35 + 0.3 * s.night})` : rgb(mixC(s.mid, s.top, 0.5), 0.8);
-      ctx.fillRect(wx + 6 + c * (ww - 12) / 9, hor - wh + 6 + r * (wh - 10) / 4, (ww - 12) / 9 - 4, (wh - 10) / 4 - 5);
+  function drawTower(s, x, y, w, h, hor, dark) {
+    const crown = h * 0.1, sw = w * 0.2;
+    const facade = mixC(mixC([226, 220, 208], s.hor, 0.22), [26, 30, 40], 1 - s.light);
+    const fin = mixC(facade, [255, 255, 255], 0.18 * s.light);
+    const shadeSide = s.sunX < 0.5 ? 0.18 : 0.42;
+
+    // niskie skrzydło z pasmowym przeszkleniem i ciepłym lobby
+    const ww = w * 1.4, wh = h * 0.16, wx = x - ww + w * 0.12;
+    ctx.fillStyle = rgb(mixC(facade, dark, 0.12)); ctx.fillRect(wx, hor - wh, ww, wh);
+    for (let r = 0; r < 2; r++) {
+      const ry = hor - wh + wh * (0.18 + r * 0.38), rh = wh * 0.24;
+      const rg = ctx.createLinearGradient(wx, 0, wx + ww, 0);
+      rg.addColorStop(0, rgb(mixC(s.mid, dark, 0.4 + 0.4 * (1 - s.light)))); rg.addColorStop(1, rgb(mixC(s.hor, dark, 0.5 + 0.3 * (1 - s.light))));
+      ctx.fillStyle = rg; ctx.fillRect(wx + 6, ry, ww - 12, rh);
+      if (s.lit > 0.05) { ctx.fillStyle = `rgba(255,214,160,${Math.min(0.55, s.lit) * (r ? 1 : 0.6)})`; ctx.fillRect(wx + ww * (r ? 0.1 : 0.45), ry + 1, ww * (r ? 0.32 : 0.24), rh - 2); }
     }
-    // korpus
-    ctx.fillStyle = rgb(facade); ctx.fillRect(x, y + crown, w, h - crown);
-    // korona (cofnięta)
-    ctx.fillStyle = rgb(mixC(facade, [0, 0, 0], 0.1)); ctx.fillRect(x + w * 0.12, y, w * 0.76, crown);
-    // latarnia na szczycie
+    const lobby = ctx.createLinearGradient(0, hor - wh * 0.3, 0, hor);
+    lobby.addColorStop(0, `rgba(255,200,130,${0.15 + 0.5 * s.night})`); lobby.addColorStop(1, `rgba(255,170,90,${0.25 + 0.55 * s.night})`);
+    ctx.fillStyle = lobby; ctx.fillRect(x - w * 0.1, hor - wh * 0.3, w * 0.5, wh * 0.3);
+
+    // boczna ściana (bryła)
+    ctx.fillStyle = rgb(mixC(facade, dark, shadeSide)); ctx.beginPath();
+    ctx.moveTo(x + w, y + crown); ctx.lineTo(x + w + sw, y + crown + sw * 0.25); ctx.lineTo(x + w + sw, hor); ctx.lineTo(x + w, hor); ctx.closePath(); ctx.fill();
+    const fh = (h - crown) / FLOORS;
+    for (let f = 0; f < FLOORS; f++) for (let c = 0; c < SIDE; c++) {
+      const idx = FLOORS * COLS + f * SIDE + c;
+      const sx0 = x + w + 4 + c * (sw - 6) / SIDE, sy0 = y + crown + sw * 0.25 * (c + 0.5) / SIDE + f * fh;
+      const lit = winSeed[idx] < s.lit;
+      ctx.fillStyle = lit ? `rgba(255,214,160,${0.3 + 0.4 * s.night})` : rgb(mixC(s.mid, dark, 0.55 + 0.35 * (1 - s.light)));
+      ctx.fillRect(sx0, sy0 + 2, (sw - 6) / SIDE - 3, fh - 4);
+    }
+
+    // korona: dwa uskoki + pergola tarasu na dachu
+    ctx.fillStyle = rgb(mixC(facade, dark, 0.08)); ctx.fillRect(x + w * 0.06, y + crown * 0.45, w * 0.88, crown * 0.55);
+    ctx.fillStyle = rgb(mixC(facade, dark, 0.16)); ctx.fillRect(x + w * 0.16, y + crown * 0.05, w * 0.68, crown * 0.4);
+    ctx.fillStyle = rgb(fin, 0.9);
+    for (let i = 0; i <= 8; i++) ctx.fillRect(x + w * 0.16 + i * w * 0.68 / 8, y - crown * 0.25, 1.5, crown * 0.3);
+    ctx.fillRect(x + w * 0.16, y - crown * 0.25, w * 0.68, 2);
+    if (s.night > 0.3) { ctx.fillStyle = `rgba(255,210,150,${0.5 * s.night})`; ctx.fillRect(x + w * 0.18, y + crown * 0.1, w * 0.64, crown * 0.28); }
     const beacon = (Math.sin(time * 0.004) + 1) / 2;
     if (s.night > 0.3) {
-      const bg = ctx.createRadialGradient(x + w / 2, y - 6, 0, x + w / 2, y - 6, 40);
+      const bg = ctx.createRadialGradient(x + w / 2, y - crown * 0.4, 0, x + w / 2, y - crown * 0.4, 46);
       bg.addColorStop(0, `rgba(255,190,110,${0.8 * s.night * (0.4 + 0.6 * beacon)})`); bg.addColorStop(1, 'rgba(255,190,110,0)');
-      ctx.fillStyle = bg; ctx.fillRect(x + w / 2 - 40, y - 46, 80, 80);
+      ctx.fillStyle = bg; ctx.fillRect(x + w / 2 - 46, y - crown * 0.4 - 46, 92, 92);
     }
     ctx.fillStyle = s.night > 0.3 ? `rgba(255,214,150,${0.6 + 0.4 * beacon})` : rgb(fin);
-    ctx.fillRect(x + w / 2 - 2, y - 14, 4, 14);
+    ctx.fillRect(x + w / 2 - 2, y - crown * 0.55, 4, crown * 0.32);
 
-    // szklana ściana: jedno odbicie nieba na całej fasadzie
-    const pad = w * 0.045, gx = x + pad, gy = y + crown + 4, gwid = w - pad * 2, ghei = h - crown - 4;
+    // fasada frontowa: szklana ściana
+    const pad = w * 0.04, gx = x + pad, gy = y + crown, gwid = w - pad * 2, ghei = h - crown;
+    ctx.fillStyle = rgb(facade); ctx.fillRect(x, gy, w, ghei);
     const gw = gwid / COLS, gh = ghei / FLOORS;
-    const refl = ctx.createLinearGradient(gx, gy, gx + gwid * 0.4, gy + ghei);
-    const dark = [10, 14, 24];
-    refl.addColorStop(0, rgb(mixC(mixC(s.top, s.mid, 0.4), dark, 0.25 + 0.5 * (1 - s.light))));
-    refl.addColorStop(0.55, rgb(mixC(s.mid, dark, 0.35 + 0.45 * (1 - s.light))));
-    refl.addColorStop(1, rgb(mixC(s.hor, dark, 0.45 + 0.4 * (1 - s.light))));
+    const refl = ctx.createLinearGradient(gx, gy, gx + gwid * 0.45, gy + ghei);
+    refl.addColorStop(0, rgb(mixC(mixC(s.top, s.mid, 0.4), dark, 0.22 + 0.5 * (1 - s.light))));
+    refl.addColorStop(0.55, rgb(mixC(s.mid, dark, 0.32 + 0.45 * (1 - s.light))));
+    refl.addColorStop(1, rgb(mixC(s.hor, dark, 0.42 + 0.4 * (1 - s.light))));
     ctx.fillStyle = refl; ctx.fillRect(gx, gy, gwid, ghei);
-    // odblask słońca: ukośny pas
     if (s.sun > 0 && s.light > 0.4) {
       const bandX = gx + gwid * (1 - s.sunX);
       const bg2 = ctx.createLinearGradient(bandX - gwid * 0.35, gy, bandX + gwid * 0.35, gy + ghei * 0.6);
       const c2 = mixC([255, 250, 235], [255, 190, 120], s.warm);
-      bg2.addColorStop(0, rgb(c2, 0)); bg2.addColorStop(0.5, rgb(c2, 0.32 * s.light * (1 - s.cloud * 0.6))); bg2.addColorStop(1, rgb(c2, 0));
+      bg2.addColorStop(0, rgb(c2, 0)); bg2.addColorStop(0.5, rgb(c2, 0.34 * s.light * (1 - s.cloud * 0.6))); bg2.addColorStop(1, rgb(c2, 0));
       ctx.fillStyle = bg2; ctx.fillRect(gx, gy, gwid, ghei);
     }
-    // zapalone wnętrza
-    for (let f = 0; f < FLOORS; f++) {
-      for (let c = 0; c < COLS; c++) {
-        const idx = f * COLS + c;
-        if (winSeed[idx] >= s.lit) continue;
-        const px = gx + c * gw, py = gy + f * gh;
-        const warmth = 0.85 + 0.15 * Math.sin(idx * 3.1);
-        const dim = 0.45 + 0.55 * winSeed[(idx * 7 + 3) % winSeed.length];
-        const a = (0.3 + 0.45 * s.night) * dim;
-        const lg = ctx.createLinearGradient(0, py, 0, py + gh);
-        lg.addColorStop(0, `rgba(255,${(232 * warmth) | 0},${(196 * warmth) | 0},${a})`);
-        lg.addColorStop(1, `rgba(240,${(196 * warmth) | 0},${(140 * warmth) | 0},${a * 0.55})`);
-        ctx.fillStyle = lg; ctx.fillRect(px + 2, py + 2.5, gw - 4, gh - 5);
-      }
+    // mokra elewacja w deszczu
+    if (s.rain > 0.1) {
+      const wet = ctx.createLinearGradient(0, gy, 0, gy + ghei);
+      wet.addColorStop(0, `rgba(170,190,220,${0.05 * s.rain})`); wet.addColorStop(1, `rgba(170,190,220,${0.16 * s.rain})`);
+      ctx.fillStyle = wet; ctx.fillRect(gx, gy, gwid, ghei);
     }
-    // stropy (białe krawędzie płyt) i cienkie szprosy
+    // zapalone wnętrza: zasłony, lampy, różna jasność
+    for (let f = 0; f < FLOORS; f++) for (let c = 0; c < COLS; c++) {
+      const idx = f * COLS + c;
+      if (winSeed[idx] >= s.lit) continue;
+      const px = gx + c * gw, py = gy + f * gh;
+      const k = winSeed[(idx * 7 + 3) % winSeed.length];
+      const a = (0.32 + 0.5 * s.night) * (0.45 + 0.55 * k);
+      const lg = ctx.createLinearGradient(0, py, 0, py + gh);
+      lg.addColorStop(0, `rgba(255,${(226 + k * 14) | 0},${(180 + k * 30) | 0},${a})`);
+      lg.addColorStop(1, `rgba(236,${(176 + k * 20) | 0},${(120 + k * 20) | 0},${a * 0.5})`);
+      ctx.fillStyle = lg; ctx.fillRect(px + 2, py + 2.5, gw - 4, gh - 5);
+      if (k > 0.6) { ctx.fillStyle = `rgba(30,22,14,${0.35 * a})`; ctx.fillRect(px + 2, py + 2.5, (gw - 4) * 0.28, gh - 5); }
+      if (k < 0.2) { ctx.fillStyle = `rgba(255,240,210,${a})`; ctx.fillRect(px + gw * 0.62, py + gh * 0.32, 2, 2); }
+    }
+    // stropy i szprosy
     ctx.fillStyle = rgb(fin, 0.95);
-    for (let f = 0; f <= FLOORS; f++) ctx.fillRect(x, gy + f * gh - 1.2, w, 2.4);
-    ctx.fillStyle = rgb(mixC(fin, dark, 0.35), 0.8);
+    for (let f = 0; f <= FLOORS; f++) ctx.fillRect(x, gy + f * gh - 1.1, w, 2.2);
+    ctx.fillStyle = rgb(mixC(fin, dark, 0.35), 0.75);
     for (let c = 1; c < COLS; c++) ctx.fillRect(gx + c * gw - 0.6, gy, 1.2, ghei);
-    // pionowe pilastry na narożach
-    ctx.fillStyle = rgb(fin); ctx.fillRect(x, y + crown, pad, h - crown); ctx.fillRect(x + w - pad, y + crown, pad, h - crown);
-    // cieniowanie bryły (światło z boku słońca)
+    // tarasy od 12. piętra: wysunięte płyty po stronie zachodniej + szklane balustrady
+    const tExt = w * 0.09;
+    for (let f = 0; f < FLOORS; f++) {
+      const fromBottom = FLOORS - 1 - f;
+      if (fromBottom < TERRACE_FROM || fromBottom % 2) continue;
+      const slabY = gy + (f + 1) * gh;
+      ctx.fillStyle = rgb(mixC(s.mid, s.top, 0.3), 0.35); ctx.fillRect(x - tExt, slabY - gh * 0.42, tExt + pad, gh * 0.42);
+      ctx.fillStyle = rgb(fin); ctx.fillRect(x - tExt, slabY - 1.5, tExt + pad + 2, 3);
+      ctx.fillStyle = rgb(mixC(fin, dark, 0.3)); ctx.fillRect(x - tExt, slabY - gh * 0.42, 1.2, gh * 0.42);
+    }
+    // narożne pilastry
+    ctx.fillStyle = rgb(fin); ctx.fillRect(x, gy, pad, ghei); ctx.fillRect(x + w - pad, gy, pad, ghei);
+    // modelowanie światłem
     const side = ctx.createLinearGradient(x, 0, x + w, 0);
     const lightLeft = s.sunX < 0.5;
-    side.addColorStop(0, `rgba(0,0,0,${lightLeft ? 0 : 0.28})`);
-    side.addColorStop(1, `rgba(0,0,0,${lightLeft ? 0.28 : 0})`);
-    ctx.fillStyle = side; ctx.fillRect(x, y, w, h);
-    if (s.warm > 0.5 && s.sun > -0.1) { ctx.fillStyle = `rgba(255,150,70,${0.12 * s.warm})`; ctx.fillRect(x, y, w, h); }
+    side.addColorStop(0, `rgba(0,0,0,${lightLeft ? 0 : 0.22})`); side.addColorStop(1, `rgba(0,0,0,${lightLeft ? 0.22 : 0})`);
+    ctx.fillStyle = side; ctx.fillRect(x - tExt, y, w + tExt, h);
+    if (s.warm > 0.5 && s.sun > -0.1) { ctx.fillStyle = `rgba(255,150,70,${0.12 * s.warm})`; ctx.fillRect(x - tExt, y, w + tExt + sw, h); }
   }
 
   // HUD + rozdziały
