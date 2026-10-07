@@ -46,7 +46,7 @@
   // stałe losowe (deterministyczne)
   let seed = 7;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const FLOORS = 26, COLS = 7;
+  const FLOORS = 28, COLS = 5;
   const winSeed = Array.from({ length: FLOORS * COLS }, () => rnd());
   const stars = Array.from({ length: 140 }, () => [rnd(), rnd() * 0.6, rnd() * 1.4 + 0.3, rnd()]);
   const city = Array.from({ length: 46 }, (_, i) => [i / 46, 0.02 + rnd() * 0.07, rnd()]);
@@ -136,7 +136,7 @@
 
     // wieża
     const tw = Math.min(W * (mobile ? 0.4 : 0.17), 300);
-    const th = Math.min(H * (mobile ? 0.5 : 0.62), tw * 3.4);
+    const th = Math.min(H * (mobile ? 0.46 : 0.56), tw * 3.4);
     const tx = mobile ? W * 0.5 - tw / 2 : W * 0.68 - tw / 2;
     const ty = hor - th;
     drawTower(s, tx, ty, tw, th, hor);
@@ -228,30 +228,44 @@
     ctx.fillStyle = s.night > 0.3 ? `rgba(255,214,150,${0.6 + 0.4 * beacon})` : rgb(fin);
     ctx.fillRect(x + w / 2 - 2, y - 14, 4, 14);
 
-    // okna
-    const pad = w * 0.06, gw = (w - pad * 2) / COLS, gh = (h - crown - pad) / FLOORS;
+    // szklana ściana: jedno odbicie nieba na całej fasadzie
+    const pad = w * 0.045, gx = x + pad, gy = y + crown + 4, gwid = w - pad * 2, ghei = h - crown - 4;
+    const gw = gwid / COLS, gh = ghei / FLOORS;
+    const refl = ctx.createLinearGradient(gx, gy, gx + gwid * 0.4, gy + ghei);
+    const dark = [10, 14, 24];
+    refl.addColorStop(0, rgb(mixC(mixC(s.top, s.mid, 0.4), dark, 0.25 + 0.5 * (1 - s.light))));
+    refl.addColorStop(0.55, rgb(mixC(s.mid, dark, 0.35 + 0.45 * (1 - s.light))));
+    refl.addColorStop(1, rgb(mixC(s.hor, dark, 0.45 + 0.4 * (1 - s.light))));
+    ctx.fillStyle = refl; ctx.fillRect(gx, gy, gwid, ghei);
+    // odblask słońca: ukośny pas
+    if (s.sun > 0 && s.light > 0.4) {
+      const bandX = gx + gwid * (1 - s.sunX);
+      const bg2 = ctx.createLinearGradient(bandX - gwid * 0.35, gy, bandX + gwid * 0.35, gy + ghei * 0.6);
+      const c2 = mixC([255, 250, 235], [255, 190, 120], s.warm);
+      bg2.addColorStop(0, rgb(c2, 0)); bg2.addColorStop(0.5, rgb(c2, 0.32 * s.light * (1 - s.cloud * 0.6))); bg2.addColorStop(1, rgb(c2, 0));
+      ctx.fillStyle = bg2; ctx.fillRect(gx, gy, gwid, ghei);
+    }
+    // zapalone wnętrza
     for (let f = 0; f < FLOORS; f++) {
       for (let c = 0; c < COLS; c++) {
-        const wxp = x + pad + c * gw, wyp = y + crown + pad * 0.5 + f * gh;
         const idx = f * COLS + c;
-        const lit = winSeed[idx] < s.lit;
-        if (lit) {
-          const warmth = 0.75 + 0.25 * Math.sin(idx * 3.1);
-          ctx.fillStyle = `rgba(255,${(200 * warmth) | 0},${(130 * warmth) | 0},${0.55 + 0.45 * s.night})`;
-        } else {
-          // odbicie nieba w szkle, jaśniejsze wyżej
-          const refl = mixC(mixC(s.mid, s.hor, f / FLOORS), [12, 16, 26], 0.35 + 0.4 * (1 - s.light));
-          const glint = s.sun > 0 ? Math.max(0, 1 - Math.abs((c / COLS) - (1 - s.sunX)) * 3) * 0.25 * s.light : 0;
-          ctx.fillStyle = rgb(mixC(refl, [255, 240, 220], glint));
-        }
-        ctx.fillRect(wxp + 1.5, wyp + 1.5, gw - 3, gh - 3.5);
+        if (winSeed[idx] >= s.lit) continue;
+        const px = gx + c * gw, py = gy + f * gh;
+        const warmth = 0.85 + 0.15 * Math.sin(idx * 3.1);
+        const a = 0.35 + 0.6 * s.night;
+        const lg = ctx.createLinearGradient(0, py, 0, py + gh);
+        lg.addColorStop(0, `rgba(255,${(226 * warmth) | 0},${(178 * warmth) | 0},${a})`);
+        lg.addColorStop(1, `rgba(255,${(186 * warmth) | 0},${(120 * warmth) | 0},${a * 0.75})`);
+        ctx.fillStyle = lg; ctx.fillRect(px, py, gw, gh);
       }
-      // płyty balkonów co 2 piętra
-      if (f % 2 === 1) { ctx.fillStyle = rgb(fin, 0.9); ctx.fillRect(x - 3, y + crown + pad * 0.5 + (f + 1) * gh - 2, w + 6, 2); }
     }
-    // pionowe lamele
-    ctx.fillStyle = rgb(fin, 0.75);
-    for (let c = 0; c <= COLS; c++) ctx.fillRect(x + pad + c * gw - 1, y + crown, 2, h - crown);
+    // stropy (białe krawędzie płyt) i cienkie szprosy
+    ctx.fillStyle = rgb(fin, 0.95);
+    for (let f = 0; f <= FLOORS; f++) ctx.fillRect(x, gy + f * gh - 1.2, w, 2.4);
+    ctx.fillStyle = rgb(mixC(fin, dark, 0.35), 0.8);
+    for (let c = 1; c < COLS; c++) ctx.fillRect(gx + c * gw - 0.6, gy, 1.2, ghei);
+    // pionowe pilastry na narożach
+    ctx.fillStyle = rgb(fin); ctx.fillRect(x, y + crown, pad, h - crown); ctx.fillRect(x + w - pad, y + crown, pad, h - crown);
     // cieniowanie bryły (światło z boku słońca)
     const side = ctx.createLinearGradient(x, 0, x + w, 0);
     const lightLeft = s.sunX < 0.5;
