@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-08T01:00:00Z",
+  "title": "Design System: HORYZONT",
+  "extensions": {
+    "colorMeta": {
+      "brass": { "role": "primary", "displayName": "Lamp Brass", "canonical": "#c9a46a", "tonalRamp": ["#2e2412", "#4a3b20", "#6b5631", "#8f7444", "#b39058", "#c9a46a", "#dcbd88", "#f1e3c8"] },
+      "brass-hi": { "role": "primary", "displayName": "Lit Brass", "canonical": "#dcbd88", "tonalRamp": ["#2e2412", "#4a3b20", "#6b5631", "#8f7444", "#c9a46a", "#dcbd88", "#e9d3ab", "#f6ecda"] },
+      "night": { "role": "neutral", "displayName": "Night Navy", "canonical": "#0a0f1a", "tonalRamp": ["#070b13", "#0a0f1a", "#0f1624", "#141c2c", "#263248", "#4a5670", "#8a93a3", "#d6dae2"] },
+      "night-2": { "role": "neutral", "displayName": "Deep Harbour", "canonical": "#0f1624" },
+      "panel": { "role": "neutral", "displayName": "Chart Panel", "canonical": "#141c2c" },
+      "line": { "role": "neutral", "displayName": "Drafting Line", "canonical": "#263248" },
+      "text": { "role": "neutral", "displayName": "Warm Paper", "canonical": "#ece6da", "tonalRamp": ["#3a362f", "#5c574e", "#7f796f", "#a39d92", "#c6c0b4", "#ece6da", "#f1ece2", "#faf7f1"] },
+      "muted": { "role": "neutral", "displayName": "Fog Grey", "canonical": "#a7afbd" },
+      "status-free": { "role": "status", "displayName": "Free", "canonical": "#7fc29b" },
+      "status-held": { "role": "status", "displayName": "Held", "canonical": "#e0b45e" },
+      "status-sold": { "role": "status", "displayName": "Sold", "canonical": "#8a93a3" },
+      "error": { "role": "status", "displayName": "Error", "canonical": "#ff9b86" },
+      "footer-night": { "role": "neutral", "displayName": "Footer Night", "canonical": "#070b13" },
+      "plan-ground": { "role": "neutral", "displayName": "Plan Ground", "canonical": "#0d1422" },
+      "scrim": { "role": "overlay", "displayName": "Scene Scrim", "canonical": "#060910" },
+      "scene-text": { "role": "neutral", "displayName": "Scene Text", "canonical": "#f1ece2" },
+      "scene-text-dim": { "role": "neutral", "displayName": "Scene Text Dim", "canonical": "#e3dccf" },
+      "brass-ink": { "role": "neutral", "displayName": "Brass Ink", "canonical": "#3b2e18" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Scene h1 only; uppercase, width 125." },
+      "headline": { "displayName": "Headline", "purpose": "Section and chapter h2; uppercase, width 125, balanced." },
+      "title": { "displayName": "Title", "purpose": "Plan head, offer titles, done state." },
+      "figure": { "displayName": "Figure", "purpose": "Prices, monthly payment, chapter facts; wide and tabular." },
+      "hud-clock": { "displayName": "HUD Clock", "purpose": "Scene clock only." },
+      "body": { "displayName": "Body", "purpose": "Running text, 16px under 640px." },
+      "lead": { "displayName": "Lead", "purpose": "Section intros in muted, max 46ch." },
+      "label": { "displayName": "Label", "purpose": "Uppercase tracked metadata: spec terms, result labels, offer location, footer headings." },
+      "button": { "displayName": "Button", "purpose": "Buttons and FAB; wide uppercase." }
+    },
+    "shadows": [
+      { "name": "scene-copy", "value": "0 2px 18px rgba(0,0,0,.45)", "purpose": "text-shadow on chapter copy over the canvas." },
+      { "name": "hud", "value": "0 2px 14px rgba(0,0,0,.5)", "purpose": "text-shadow on the HUD." },
+      { "name": "fab-lift", "value": "0 14px 30px -12px rgba(0,0,0,.7)", "purpose": "Mobile sticky CTA only." },
+      { "name": "header-glass", "value": "backdrop-filter: blur(14px) saturate(1.2)", "purpose": "Fixed header frosting." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(.16, 1, .3, 1)", "purpose": "Default ease-out for lifts, underlines, chapter reveals." },
+      { "name": "state", "value": ".2s-.25s", "purpose": "Colour and border changes on buttons, chips, fields." },
+      { "name": "chapter-in", "value": "opacity .6s / transform .8s, .2s delay", "purpose": "Chapter crossfade with 14px rise." },
+      { "name": "card-lift", "value": "transform .45s, image scale .8s", "purpose": "Offer card hover." },
+      { "name": "reduced", "value": "prefers-reduced-motion: all transitions off", "purpose": "Content fully visible without motion." }
+    ],
+    "breakpoints": [
+      { "name": "tablet", "value": "1000px" },
+      { "name": "phone", "value": "640px" }
+    ],
+    "sceneKeyframes": {
+      "purpose": "Procedural canvas sky (app.js KF), interpolated by scroll progress. Scene-only; never used in UI chrome.",
+      "elements": ["sky gradient top/mid/horizon", "sun or moon with stars", "clouds, fog, rain, lightning", "Kępa Redłowska cliff", "sea with shimmer and pier lamps", "tower with shaded side plane, west terraces, crown pergola and beacon", "water reflection", "ships at night"],
+      "stops": [
+        { "t": 0.12, "name": "Dawn", "top": "#2a3f74", "mid": "#9a8fb0", "hor": "#ffc9a0", "sea": "#4a5779" },
+        { "t": 0.32, "name": "Noon", "top": "#2f6fbf", "mid": "#79aee2", "hor": "#d6ecf8", "sea": "#2d5f8f" },
+        { "t": 0.54, "name": "Golden hour", "top": "#36366e", "mid": "#c2667a", "hor": "#ffb062", "sea": "#5b4560" },
+        { "t": 0.74, "name": "Rain", "top": "#1b2330", "mid": "#2e3848", "hor": "#4a5566", "sea": "#1d2633" },
+        { "t": 0.95, "name": "Night", "top": "#03060f", "mid": "#0b1430", "hor": "#1f2b4d", "sea": "#070c1a" }
+      ],
+      "lampLight": "rgba(255,214,160,a) / rgba(255,200,130,a) warm window, lobby and pier light"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Brass action: main CTAs, plan inquiry, form submit.",
+      "html": "<a class=\"ds-btn ds-btn-gold\" href=\"#\">Wybierz apartament</a>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 14px 26px; font: 600 14px/1.15 Archivo, system-ui, sans-serif; font-stretch: 125%; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border: 1.5px solid transparent; border-radius: 2px; cursor: pointer; transition: background-color .25s, color .25s, transform .25s cubic-bezier(.16,1,.3,1); } .ds-btn-gold { background: #c9a46a; color: #0a0f1a; } .ds-btn-gold:hover { background: #dcbd88; transform: translateY(-2px); } .ds-btn:focus-visible { outline: 2px solid #dcbd88; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action, also over the canvas.",
+      "html": "<a class=\"ds-btn-line\" href=\"#\">Umów prezentację</a>",
+      "css": ".ds-btn-line { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 14px 26px; font: 600 14px/1.15 Archivo, system-ui, sans-serif; font-stretch: 125%; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; background: rgba(10,15,26,.35); color: #ece6da; border: 1.5px solid rgba(236,230,218,.7); border-radius: 2px; transition: background-color .25s, color .25s; } .ds-btn-line:hover { background: #ece6da; color: #0a0f1a; } .ds-btn-line:focus-visible { outline: 2px solid #dcbd88; outline-offset: 3px; }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Room and property-type filters.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip is-on\">Wszystkie</button><button class=\"ds-chip\">2</button><button class=\"ds-chip\">3</button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; background: #0f1624; padding: 16px; } .ds-chip { min-height: 42px; padding: 8px 16px; border: 1.5px solid #263248; background: transparent; color: #ece6da; font: 600 14px/1 Archivo, system-ui, sans-serif; border-radius: 2px; cursor: pointer; transition: border-color .2s, background-color .2s, color .2s; } .ds-chip:hover { border-color: #c9a46a; } .ds-chip.is-on { background: #c9a46a; border-color: #c9a46a; color: #0a0f1a; } .ds-chip:focus-visible { outline: 2px solid #dcbd88; outline-offset: 3px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Contact form field with label.",
+      "html": "<div class=\"ds-field\"><label for=\"ds-n\">Telefon</label><input id=\"ds-n\" placeholder=\"+48\"></div>",
+      "css": ".ds-field { background: #141c2c; padding: 20px; font-family: Archivo, system-ui, sans-serif; } .ds-field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #ece6da; } .ds-field input { display: block; width: 100%; min-height: 54px; padding: 13px 14px; font: 400 16px/1.3 Archivo, system-ui, sans-serif; color: #ece6da; background: #0a0f1a; border: 1.5px solid #263248; border-radius: 2px; caret-color: #c9a46a; transition: border-color .2s; box-sizing: border-box; } .ds-field input:focus { outline: none; border-color: #c9a46a; }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "custom",
+      "refersTo": "segment",
+      "description": "Presentation mode choice in the contact form.",
+      "html": "<div class=\"ds-seg\"><label><input type=\"radio\" name=\"ds-m\" checked><span>Na miejscu</span></label><label><input type=\"radio\" name=\"ds-m\"><span>W biurze</span></label><label><input type=\"radio\" name=\"ds-m\"><span>Online</span></label></div>",
+      "css": ".ds-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #141c2c; padding: 16px; font-family: Archivo, system-ui, sans-serif; } .ds-seg label { position: relative; } .ds-seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; } .ds-seg span { display: grid; place-items: center; min-height: 50px; padding: 8px; border: 1.5px solid #263248; color: #ece6da; font-weight: 600; font-size: 15px; transition: border-color .2s, background-color .2s, color .2s; } .ds-seg label:hover span { border-color: #c9a46a; } .ds-seg input:checked + span { background: #c9a46a; border-color: #c9a46a; color: #0a0f1a; } .ds-seg input:focus-visible + span { outline: 2px solid #dcbd88; outline-offset: 3px; }"
+    },
+    {
+      "name": "Header Nav",
+      "kind": "nav",
+      "refersTo": "header",
+      "description": "Frosted fixed header with brand mark, underline links and brass CTA.",
+      "html": "<header class=\"ds-head\"><a class=\"ds-brand\" href=\"#\"><svg viewBox=\"0 0 32 20\"><path d=\"M1 15h30\"/><path d=\"M9 15a7 7 0 0 1 14 0\"/></svg><span>HORYZONT</span></a><nav class=\"ds-nav\"><a href=\"#\">Apartamenty</a><a href=\"#\">Oferty</a></nav></header>",
+      "css": ".ds-head { display: flex; align-items: center; justify-content: space-between; height: 76px; padding: 0 20px; background: rgba(10,15,26,.78); backdrop-filter: blur(14px) saturate(1.2); border-bottom: 1px solid rgba(201,164,106,.22); font-family: Archivo, system-ui, sans-serif; } .ds-brand { display: inline-flex; align-items: center; gap: 12px; color: #ece6da; text-decoration: none; } .ds-brand svg { width: 34px; height: 22px; fill: none; stroke: #c9a46a; stroke-width: 2; } .ds-brand span { font-size: 19px; font-weight: 700; font-stretch: 125%; letter-spacing: .26em; } .ds-nav { display: flex; gap: 30px; } .ds-nav a { color: #ece6da; font-size: 15px; font-weight: 500; text-decoration: none; padding-block: 6px; background: linear-gradient(#c9a46a, #c9a46a) 0 100% / 0 1.5px no-repeat; transition: background-size .35s cubic-bezier(.16,1,.3,1); } .ds-nav a:hover { background-size: 100% 1.5px; }"
+    },
+    {
+      "name": "Offer Card",
+      "kind": "card",
+      "refersTo": "card-panel",
+      "description": "Property card in the offers grid.",
+      "html": "<article class=\"ds-offer\"><div class=\"ds-offer-img\"></div><div class=\"ds-offer-body\"><h3>Dom na klifie</h3><p class=\"ds-loc\">Gdynia · Orłowo</p><ul><li>280 m²</li><li>5 pokoi</li></ul><p class=\"ds-price\">7 200 000 zł</p></div></article>",
+      "css": ".ds-offer { max-width: 360px; background: #141c2c; border: 1px solid #263248; color: #ece6da; font-family: Archivo, system-ui, sans-serif; overflow: hidden; transition: transform .45s cubic-bezier(.16,1,.3,1), border-color .3s; } .ds-offer:hover { transform: translateY(-4px); border-color: rgba(201,164,106,.6); } .ds-offer-img { aspect-ratio: 4/3; background: linear-gradient(#36366e, #c2667a 55%, #ffb062); } .ds-offer-body { padding: 20px 22px 24px; } .ds-offer h3 { margin: 0 0 10px; font-size: 20px; font-weight: 600; line-height: 1.25; } .ds-loc { margin: -6px 0 12px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #dcbd88; } .ds-offer ul { list-style: none; padding: 0; margin: 0 0 16px; display: flex; gap: 6px 16px; font-size: 14.5px; color: #a7afbd; } .ds-price { margin: 0; font-size: 22px; font-weight: 600; font-stretch: 125%; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Unit Row + Status",
+      "kind": "custom",
+      "refersTo": "table-row-selected",
+      "description": "Units table rows with status dot; selected row in brass wash.",
+      "html": "<table class=\"ds-ut\"><thead><tr><th>Lokal</th><th>Cena</th><th>Status</th></tr></thead><tbody><tr><td>B12.3</td><td>2 140 000 zł</td><td><span class=\"ds-st ds-free\">Wolny</span></td></tr><tr class=\"is-on\"><td>B18.1</td><td>3 420 000 zł</td><td><span class=\"ds-st ds-held\">Rezerwacja</span></td></tr></tbody></table>",
+      "css": ".ds-ut { width: 100%; border-collapse: collapse; background: #0a0f1a; color: #ece6da; font: 400 16px Archivo, system-ui, sans-serif; font-variant-numeric: tabular-nums; border: 1px solid #263248; } .ds-ut th { background: #141c2c; text-align: left; font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #a7afbd; padding: 14px 16px; } .ds-ut td { padding: 15px 16px; border-top: 1px solid #263248; } .ds-ut td:first-child { font-weight: 600; } .ds-ut tbody tr:hover { background: rgba(201,164,106,.08); } .ds-ut tr.is-on { background: rgba(201,164,106,.16); } .ds-ut tr.is-on td:first-child { color: #dcbd88; } .ds-st { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; } .ds-st::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; } .ds-free { color: #7fc29b; } .ds-held { color: #e0b45e; }"
+    },
+    {
+      "name": "HUD Rail",
+      "kind": "custom",
+      "refersTo": "hud-clock",
+      "description": "Scene clock, weather and five-stop time-of-day rail.",
+      "html": "<aside class=\"ds-hud\"><p class=\"ds-time\">19:40</p><p class=\"ds-w\">Zachód słońca · 17°C</p><ol><li><button>Świt</button></li><li><button>Południe</button></li><li><button class=\"is-on\">Złota godzina</button></li></ol></aside>",
+      "css": ".ds-hud { text-align: right; padding: 24px; background: linear-gradient(#36366e, #c2667a 60%, #ffb062); color: #ece6da; font-family: Archivo, system-ui, sans-serif; text-shadow: 0 2px 14px rgba(0,0,0,.5); } .ds-time { margin: 0; font-size: 56px; font-weight: 500; font-stretch: 125%; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.01em; } .ds-w { margin: 8px 0 18px; font-size: 15px; color: #e3dccf; } .ds-hud ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; justify-items: end; } .ds-hud button { display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; color: rgba(236,230,218,.7); font: 500 14px/1 Archivo, system-ui, sans-serif; padding: 8px 0; cursor: pointer; text-shadow: inherit; } .ds-hud button::after { content: ''; width: 9px; height: 9px; border: 1.5px solid currentColor; border-radius: 50%; transition: transform .3s cubic-bezier(.16,1,.3,1); } .ds-hud button:hover { color: #ece6da; } .ds-hud button.is-on { color: #dcbd88; } .ds-hud button.is-on::after { background: #dcbd88; transform: scale(1.25); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Architect's Night Sheet",
+    "overview": "HORYZONT is a dark spec sheet laid over a live sky. The page opens on a full-viewport procedural canvas: the Latarnia Orłowo tower over Gdańsk Bay, scrubbed by scroll through five conditions (dawn, noon, golden hour, rain, night). Everything below the scene reads like an architect's drawing set: night navy grounds, thin brass rules, wide uppercase Archivo, tabular figures, sharp corners. Density is medium; sections alternate between two navies to separate chapters without decoration.\n\nBrass is the only accent and it does real work: primary buttons, selected states, rules that open a data block, key figures (price, monthly payment, chapter facts). The warm white text and the brass together read as lamplight on a dark facade, which is the same palette the canvas uses for lit windows at night.",
+    "keyCharacteristics": [
+      "Full-bleed scroll-driven canvas scene with a HUD (clock, weather, five-stop rail) and chapter copy on the left.",
+      "Night navy tonal layering (night, night-2, panel) instead of shadows.",
+      "Brass as the single accent; status colours only in the units table and plan.",
+      "Archivo at 125% width, uppercase, for every heading and every key number.",
+      "2px or square corners everywhere; 1px hairlines in line or brass."
+    ],
+    "rules": [
+      { "name": "The One Lamp Rule", "body": "Brass is the only accent. No second hue enters the UI chrome; status colours stay inside unit data.", "section": "colors" },
+      { "name": "The Night Sky Exception Rule", "body": "The canvas scene owns its own sky palette (see sidecar `sceneKeyframes`); those blues, mauves and ambers never leak into UI surfaces.", "section": "colors" },
+      { "name": "The Wide Numbers Rule", "body": "Every number that sells (price, rate, area, time) is set wide (125) and tabular.", "section": "typography" },
+      { "name": "The Two Widths Rule", "body": "Width 125 is for headings, brand, figures and buttons; running text stays at 100.", "section": "typography" },
+      { "name": "The Tonal Step Rule", "body": "Lift a surface by moving it one navy step and giving it a line border, never by adding a drop shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep brass as the only UI accent; use brass-hi for numbers and active states.",
+      "Do set headings, brand, buttons and key figures in Archivo at 125% width, uppercase for headings and buttons.",
+      "Do separate sections with night / night-2 alternation and 1px line borders.",
+      "Do keep corners at 2px (controls) or square (containers).",
+      "Do keep scene copy on the scrim shade with its text shadows so it stays legible from dawn through noon.",
+      "Do keep content readable with motion off; transitions collapse under prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't add drop shadows to cards or panels; use the tonal step.",
+      "Don't introduce rounded pill shapes beyond status dots, rail dots and portraits.",
+      "Don't let the canvas sky colours into UI chrome.",
+      "Don't set running text in the wide width or in uppercase."
+    ]
+  }
+}
